@@ -11,7 +11,6 @@ public class App {
         int[] bobotFinal = new int[6];
         int totalBobot = 0;
 
-        // 1. Membaca 6 Bobot Utama
         for (int i = 0; i < 6; i++) {
             if (!in.hasNextLine()) break;
             bobotFinal[i] = Integer.parseInt(in.nextLine().trim());
@@ -27,7 +26,6 @@ public class App {
         int[] totalBobotKomponen = new int[6];
         int[] totalPerolehan = new int[6];
 
-        // 2. Membaca Baris Input KomponenNilai sampai '---'
         while (in.hasNextLine()) {
             String baris = in.nextLine().trim();
             if (baris.equals("---")) break;
@@ -57,7 +55,6 @@ public class App {
                 int b = Integer.parseInt(potongan[1].trim());
                 int p = Integer.parseInt(potongan[2].trim());
 
-                // Clamping perolehan nilai agar tidak melebihi bobot komponen atau < 0
                 if (p > b) p = b;
                 if (p < 0) p = 0;
 
@@ -68,7 +65,6 @@ public class App {
             }
         }
 
-        // 3. Perhitungan dan Cetak Output
         double nilaiAkhir = 0.0;
         System.out.println("Perolehan Nilai:");
 

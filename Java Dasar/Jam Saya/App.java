@@ -12,7 +12,6 @@ public class App {
 
         String line1 = sc.nextLine().trim();
 
-        // Validasi titik dua
         int colonIndex = line1.indexOf(':');
         if (colonIndex == -1 || colonIndex != line1.lastIndexOf(':')) {
             System.out.println("Jam tidak valid");
@@ -37,7 +36,6 @@ public class App {
             return;
         }
 
-        // Validasi rentang jam (0-23) dan menit (0-59)
         if (startH < 0 || startH > 23 || startM < 0 || startM > 59) {
             System.out.println("Jam tidak valid");
             sc.close();

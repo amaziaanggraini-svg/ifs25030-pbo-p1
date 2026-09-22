@@ -4,7 +4,6 @@ public class App {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         
-        // Menggunakan array dinamis manual untuk menggantikan ArrayList
         int capacity = 10;
         int[] list = new int[capacity];
         int size = 0;
@@ -32,7 +31,6 @@ public class App {
             return;
         }
 
-        // Cari min dan max
         int min = list[0];
         int max = list[0];
         for (int i = 1; i < size; i++) {
@@ -40,7 +38,6 @@ public class App {
             if (list[i] > max) max = list[i];
         }
 
-        // Hitung frekuensi setiap angka unik (menggantikan HashMap)
         int[] uniqueNums = new int[size];
         int[] freqs = new int[size];
         int uniqueCount = 0;
@@ -64,7 +61,6 @@ public class App {
             }
         }
 
-        // Cari angka dengan frekuensi terbanyak dan tersedikit
         int maxFreq = -1;
         int minFreq = Integer.MAX_VALUE;
 
@@ -90,7 +86,6 @@ public class App {
             }
         }
 
-        // Cari jumlah kemunculan min dan max
         int countMax = 0;
         int countMin = 0;
         for (int i = 0; i < uniqueCount; i++) {
@@ -101,7 +96,6 @@ public class App {
         long sumTertinggi = (long) max * countMax;
         long sumTerendah = (long) min * countMin;
 
-        // Output Resmi sesuai Test Case
         System.out.println("Tertinggi: " + max);
         System.out.println("Terendah: " + min);
         System.out.println("Terbanyak: " + mostFreqNum + " (" + maxFreq + "x)");
