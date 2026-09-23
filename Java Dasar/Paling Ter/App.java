@@ -1,67 +1,203 @@
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class App {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<String> kataList = bacaInput(scanner);
-        scanner.close();
 
-        if (kataList.isEmpty()) {
-            return; // Tidak mencetak apapun jika input kosong
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        Map<Integer, Integer> frekuensi = bacaFrekuensi(sc);
+
+        if (frekuensi.isEmpty()) {
+            return;
         }
 
-        prosesDanCetakPalingTer(kataList);
+        int tertinggi = cariTertinggi(frekuensi);
+        int terendah = cariTerendah(frekuensi);
+        int terbanyak = cariTerbanyak(frekuensi);
+        int tersedikit = cariTersedikit(frekuensi);
+        int jumlahTertinggi = cariJumlahTerbesar(frekuensi);
+        int jumlahTerendah = cariJumlahTerkecil(frekuensi);
+
+        cetakHasil(
+            frekuensi,
+            tertinggi,
+            terendah,
+            terbanyak,
+            tersedikit,
+            jumlahTertinggi,
+            jumlahTerendah
+        );
     }
 
-    private static List<String> bacaInput(Scanner scanner) {
-        List<String> list = new ArrayList<>();
-        while (scanner.hasNext()) {
-            String kata = scanner.next();
-            if (kata.equalsIgnoreCase("---")) {
+    static Map<Integer, Integer> bacaFrekuensi(Scanner sc) {
+        Map<Integer, Integer> frekuensi = new HashMap<>();
+
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine().trim();
+
+            if (line.equals("---")) {
                 break;
             }
-            list.add(kata);
-        }
-        return list;
-    }
 
-    private static void prosesDanCetakPalingTer(List<String> kataList) {
-        int maxLen = 0;
-        int minLen = Integer.MAX_VALUE;
-
-        for (String k : kataList) {
-            int len = k.length();
-            if (len > maxLen) maxLen = len;
-            if (len < minLen) minLen = len;
-        }
-
-        List<String> terpanjang = new ArrayList<>();
-        List<String> terpendek = new ArrayList<>();
-
-        for (String k : kataList) {
-            if (k.length() == maxLen && !terpanjang.contains(k)) {
-                terpanjang.add(k);
-            }
-            if (k.length() == minLen && !terpendek.contains(k)) {
-                terpendek.add(k);
+            try {
+                int nilai = Integer.parseInt(line);
+                frekuensi.put(
+                    nilai,
+                    frekuensi.getOrDefault(nilai, 0) + 1
+                );
+            } catch (NumberFormatException e) {
+                // Input yang bukan bilangan tidak diproses.
             }
         }
 
-        Collections.sort(terpanjang);
-        Collections.sort(terpendek);
-
-        cetakHasil(terpanjang, terpendek);
+        return frekuensi;
     }
 
-    private static void cetakHasil(List<String> terpanjang, List<String> terpendek) {
-        for (String k : terpanjang) {
-            System.out.println(k);
+    static int cariTertinggi(Map<Integer, Integer> frekuensi) {
+        int hasil = Integer.MIN_VALUE;
+
+        for (int nilai : frekuensi.keySet()) {
+            if (nilai > hasil) {
+                hasil = nilai;
+            }
         }
-        for (String k : terpendek) {
-            System.out.println(k);
+
+        return hasil;
+    }
+
+    static int cariTerendah(Map<Integer, Integer> frekuensi) {
+        int hasil = Integer.MAX_VALUE;
+
+        for (int nilai : frekuensi.keySet()) {
+            if (nilai < hasil) {
+                hasil = nilai;
+            }
         }
+
+        return hasil;
+    }
+
+    static int cariTerbanyak(Map<Integer, Integer> frekuensi) {
+        int hasil = 0;
+        int frekuensiTerbesar = -1;
+        boolean pertama = true;
+
+        for (Map.Entry<Integer, Integer> entry : frekuensi.entrySet()) {
+            int nilai = entry.getKey();
+            int jumlah = entry.getValue();
+
+            if (pertama
+                || jumlah > frekuensiTerbesar
+                || (jumlah == frekuensiTerbesar && nilai > hasil)) {
+                hasil = nilai;
+                frekuensiTerbesar = jumlah;
+                pertama = false;
+            }
+        }
+
+        return hasil;
+    }
+
+    static int cariTersedikit(Map<Integer, Integer> frekuensi) {
+        int hasil = 0;
+        int frekuensiTerkecil = Integer.MAX_VALUE;
+        boolean pertama = true;
+
+        for (Map.Entry<Integer, Integer> entry : frekuensi.entrySet()) {
+            int nilai = entry.getKey();
+            int jumlah = entry.getValue();
+
+            if (pertama
+                || jumlah < frekuensiTerkecil
+                || (jumlah == frekuensiTerkecil && nilai < hasil)) {
+                hasil = nilai;
+                frekuensiTerkecil = jumlah;
+                pertama = false;
+            }
+        }
+
+        return hasil;
+    }
+
+    static int cariJumlahTerbesar(Map<Integer, Integer> frekuensi) {
+        int hasil = 0;
+        long jumlahTerbesar = Long.MIN_VALUE;
+        boolean pertama = true;
+
+        for (Map.Entry<Integer, Integer> entry : frekuensi.entrySet()) {
+            int nilai = entry.getKey();
+            int jumlah = entry.getValue();
+            long hasilKali = (long) nilai * jumlah;
+
+            if (pertama
+                || hasilKali > jumlahTerbesar
+                || (hasilKali == jumlahTerbesar && nilai > hasil)) {
+                hasil = nilai;
+                jumlahTerbesar = hasilKali;
+                pertama = false;
+            }
+        }
+
+        return hasil;
+    }
+
+    static int cariJumlahTerkecil(Map<Integer, Integer> frekuensi) {
+        int hasil = 0;
+        long jumlahTerkecil = Long.MAX_VALUE;
+        boolean pertama = true;
+
+        for (Map.Entry<Integer, Integer> entry : frekuensi.entrySet()) {
+            int nilai = entry.getKey();
+            int jumlah = entry.getValue();
+            long hasilKali = (long) nilai * jumlah;
+
+            if (pertama
+                || hasilKali < jumlahTerkecil
+                || (hasilKali == jumlahTerkecil && nilai < hasil)) {
+                hasil = nilai;
+                jumlahTerkecil = hasilKali;
+                pertama = false;
+            }
+        }
+
+        return hasil;
+    }
+
+    static void cetakHasil(
+        Map<Integer, Integer> frekuensi,
+        int tertinggi,
+        int terendah,
+        int terbanyak,
+        int tersedikit,
+        int jumlahTertinggi,
+        int jumlahTerendah
+    ) {
+        long nilaiJumlahTertinggi =
+            (long) jumlahTertinggi * frekuensi.get(jumlahTertinggi);
+
+        long nilaiJumlahTerendah =
+            (long) jumlahTerendah * frekuensi.get(jumlahTerendah);
+
+        System.out.println("Tertinggi: " + tertinggi);
+        System.out.println("Terendah: " + terendah);
+        System.out.println(
+            "Terbanyak: " + terbanyak
+            + " (" + frekuensi.get(terbanyak) + "x)"
+        );
+        System.out.println(
+            "Tersedikit: " + tersedikit
+            + " (" + frekuensi.get(tersedikit) + "x)"
+        );
+        System.out.println(
+            "Jumlah Tertinggi: " + jumlahTertinggi
+            + " * " + frekuensi.get(jumlahTertinggi)
+            + " = " + nilaiJumlahTertinggi
+        );
+        System.out.println(
+            "Jumlah Terendah: " + jumlahTerendah
+            + " * " + frekuensi.get(jumlahTerendah)
+            + " = " + nilaiJumlahTerendah
+        );
     }
 }

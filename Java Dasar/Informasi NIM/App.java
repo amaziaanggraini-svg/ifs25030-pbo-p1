@@ -1,48 +1,95 @@
 import java.util.Scanner;
 
 public class App {
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        if (!sc.hasNextLine()) {
-            sc.close();
-            return;
-        }
-        String nim = sc.nextLine().trim();
+        String nim = bacaNim(sc);
 
-        if (nim.length() != 8) {
+        if (!validasiPanjang(nim)) {
             System.out.println("NIM harus 8 karakter");
-            sc.close();
             return;
         }
 
+        String programStudi = cariProgramStudi(nim);
+        if (programStudi == null) {
+            System.out.println("Kode tidak tersedia");
+            return;
+        }
+
+        int[] detail = bacaDetailNim(nim);
+        if (detail == null) {
+            System.out.println("NIM harus 8 karakter");
+            return;
+        }
+
+        cetakHasil(
+            nim,
+            programStudi,
+            detail[0],
+            detail[1]
+        );
+    }
+
+    static String bacaNim(Scanner sc) {
+        return sc.nextLine().trim();
+    }
+
+    static boolean validasiPanjang(String nim) {
+        return nim.length() == 8;
+    }
+
+    static String cariProgramStudi(String nim) {
         String prefix = nim.substring(0, 3);
-        String prodi = "";
 
         switch (prefix) {
-            case "11S": prodi = "Sarjana Informatika"; break;
-            case "12S": prodi = "Sarjana Sistem Informasi"; break;
-            case "13S": prodi = "Sarjana Teknik Elektro"; break;
-            case "21S": prodi = "Sarjana Manajemen Rekayasa"; break;
-            case "22S": prodi = "Sarjana Teknik Metalurgi"; break;
-            case "31S": prodi = "Sarjana Teknik Bioproses"; break;
-            case "32S": prodi = "Sarjana Bioteknologi"; break;
-            case "114": prodi = "Diploma 4 Teknologi Rekayasa Perangkat Lunak"; break;
-            case "113": prodi = "Diploma 3 Teknologi Informasi"; break;
-            case "133": prodi = "Diploma 3 Teknologi Komputer"; break;
+            case "11S":
+                return "Sarjana Informatika";
+            case "12S":
+                return "Sarjana Sistem Informasi";
+            case "13S":
+                return "Sarjana Teknik Elektro";
+            case "21S":
+                return "Sarjana Manajemen Rekayasa";
+            case "22S":
+                return "Sarjana Teknik Metalurgi";
+            case "31S":
+                return "Sarjana Teknik Bioproses";
+            case "32S":
+                return "Sarjana Bioteknologi";
+            case "114":
+                return "Diploma 4 Teknologi Rekayasa Perangkat Lunak";
+            case "113":
+                return "Diploma 3 Teknologi Informasi";
+            case "133":
+                return "Diploma 3 Teknologi Komputer";
             default:
-                System.out.println("Kode tidak tersedia");
-                sc.close();
-                return;
+                return null;
         }
+    }
 
-        int angkatan = Integer.parseInt("20" + nim.substring(3, 5));
-        int urutan = Integer.parseInt(nim.substring(5, 8));
+    static int[] bacaDetailNim(String nim) {
+        try {
+            int angkatan =
+                Integer.parseInt("20" + nim.substring(3, 5));
+            int urutan =
+                Integer.parseInt(nim.substring(5, 8));
 
+            return new int[] {angkatan, urutan};
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    static void cetakHasil(
+        String nim,
+        String programStudi,
+        int angkatan,
+        int urutan
+    ) {
         System.out.println("Informasi NIM " + nim + ": ");
-        System.out.println(">> Program Studi: " + prodi);
+        System.out.println(">> Program Studi: " + programStudi);
         System.out.println(">> Angkatan: " + angkatan);
         System.out.println(">> Urutan: " + urutan);
-
-        sc.close();
     }
 }
