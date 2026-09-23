@@ -1,40 +1,23 @@
 import java.util.Scanner;
 
 public class App {
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-
-        int[] list = parseInput(sc);
-
-        // Jika input kosong, LANGSUNG keluar tanpa mencetak output apapun
-        if (list.length == 0) {
-            sc.close();
-            return;
-        }
-
-        prosesDanCetak(list);
-
-        sc.close();
-    }
-
-    /**
-     * Membaca input angka dari Scanner hingga sentinel '---' atau EOF.
-     */
-    private static int[] parseInput(Scanner sc) {
+        
+        // Menggunakan array dinamis manual untuk menggantikan ArrayList
         int capacity = 10;
-        int[] temp = new int[capacity];
+        int[] list = new int[capacity];
         int size = 0;
 
         while (sc.hasNext()) {
             if (sc.hasNextInt()) {
                 if (size == capacity) {
                     capacity *= 2;
-                    int[] newTemp = new int[capacity];
-                    System.arraycopy(temp, 0, newTemp, 0, size);
-                    temp = newTemp;
+                    int[] temp = new int[capacity];
+                    System.arraycopy(list, 0, temp, 0, size);
+                    list = temp;
                 }
-                temp[size++] = sc.nextInt();
+                list[size++] = sc.nextInt();
             } else {
                 String token = sc.next();
                 if (token.equals("---")) {
@@ -43,18 +26,27 @@ public class App {
             }
         }
 
-        int[] result = new int[size];
-        System.arraycopy(temp, 0, result, 0, size);
-        return result;
-    }
+        if (size == 0) {
+            System.out.println("Data kosong");
+            sc.close();
+            return;
+        }
 
-    /**
-     * Menghitung frekuensi kemunculan setiap angka unik.
-     */
-    private static int hitungFrekuensi(int[] list, int[] uniqueNums, int[] freqs) {
+        // Cari min dan max
+        int min = list[0];
+        int max = list[0];
+        for (int i = 1; i < size; i++) {
+            if (list[i] < min) min = list[i];
+            if (list[i] > max) max = list[i];
+        }
+
+        // Hitung frekuensi setiap angka unik (menggantikan HashMap)
+        int[] uniqueNums = new int[size];
+        int[] freqs = new int[size];
         int uniqueCount = 0;
 
-        for (int num : list) {
+        for (int i = 0; i < size; i++) {
+            int num = list[i];
             int index = -1;
             for (int j = 0; j < uniqueCount; j++) {
                 if (uniqueNums[j] == num) {
@@ -72,31 +64,10 @@ public class App {
             }
         }
 
-        return uniqueCount;
-    }
-
-    /**
-     * Mengolah statistik nilai (min, max, terbanyak, tersedikit) dan mencetak hasil.
-     */
-    private static void prosesDanCetak(int[] list) {
-        int size = list.length;
-
-        // 1. Cari Nilai Min dan Max
-        int min = list[0];
-        int max = list[0];
-        for (int i = 1; i < size; i++) {
-            if (list[i] < min) min = list[i];
-            if (list[i] > max) max = list[i];
-        }
-
-        // 2. Hitung Frekuensi
-        int[] uniqueNums = new int[size];
-        int[] freqs = new int[size];
-        int uniqueCount = hitungFrekuensi(list, uniqueNums, freqs);
-
-        // 3. Cari Nilai Terbanyak dan Tersedikit
+        // Cari angka dengan frekuensi terbanyak dan tersedikit
         int maxFreq = -1;
         int minFreq = Integer.MAX_VALUE;
+
         int mostFreqNum = list[0];
         int leastFreqNum = list[0];
 
@@ -119,7 +90,7 @@ public class App {
             }
         }
 
-        // 4. Hitung Frekuensi Min dan Max
+        // Cari jumlah kemunculan min dan max
         int countMax = 0;
         int countMin = 0;
         for (int i = 0; i < uniqueCount; i++) {
@@ -130,12 +101,14 @@ public class App {
         long sumTertinggi = (long) max * countMax;
         long sumTerendah = (long) min * countMin;
 
-        // 5. Cetak Output Hasil
+        // Output Resmi sesuai Test Case
         System.out.println("Tertinggi: " + max);
         System.out.println("Terendah: " + min);
         System.out.println("Terbanyak: " + mostFreqNum + " (" + maxFreq + "x)");
         System.out.println("Tersedikit: " + leastFreqNum + " (" + minFreq + "x)");
         System.out.println("Jumlah Tertinggi: " + max + " * " + countMax + " = " + sumTertinggi);
         System.out.println("Jumlah Terendah: " + min + " * " + countMin + " = " + sumTerendah);
+
+        sc.close();
     }
 }

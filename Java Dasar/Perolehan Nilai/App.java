@@ -1,16 +1,25 @@
 import java.util.*;
 
 public class App {
-
-    private static final String[] KODE = {"PA", "T", "K", "P", "UTS", "UAS"};
-    private static final String[] NAMA = {"Partisipatif", "Tugas", "Kuis", "Proyek", "UTS", "UAS"};
-
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         Locale.setDefault(Locale.US);
 
-        int[] bobotFinal = bacaBobotFinal(in);
-        if (bobotFinal == null) {
+        String[] kode = {"PA", "T", "K", "P", "UTS", "UAS"};
+        String[] nama = {"Partisipatif", "Tugas", "Kuis", "Proyek", "UTS", "UAS"};
+
+        int[] bobotFinal = new int[6];
+        int totalBobot = 0;
+
+        // 1. Membaca 6 Bobot Utama
+        for (int i = 0; i < 6; i++) {
+            if (!in.hasNextLine()) break;
+            bobotFinal[i] = Integer.parseInt(in.nextLine().trim());
+            totalBobot += bobotFinal[i];
+        }
+
+        if (totalBobot != 100) {
+            System.out.println("Total bobot harus 100");
             in.close();
             return;
         }
@@ -18,43 +27,7 @@ public class App {
         int[] totalBobotKomponen = new int[6];
         int[] totalPerolehan = new int[6];
 
-        prosesSubkomponen(in, totalBobotKomponen, totalPerolehan);
-        hitungDanCetakOutput(bobotFinal, totalBobotKomponen, totalPerolehan);
-
-        in.close();
-    }
-
-    /**
-     * Membaca 6 baris bobot komponen utama dan memvalidasi totalnya harus 100.
-     * Menggunakan try-catch untuk mengantisipasi NumberFormatException.
-     */
-    private static int[] bacaBobotFinal(Scanner in) {
-        int[] bobotFinal = new int[6];
-        int totalBobot = 0;
-
-        for (int i = 0; i < 6; i++) {
-            if (!in.hasNextLine()) break;
-            try {
-                bobotFinal[i] = Integer.parseInt(in.nextLine().trim());
-                totalBobot += bobotFinal[i];
-            } catch (NumberFormatException e) {
-                System.out.println("Format bobot tidak valid");
-                return null;
-            }
-        }
-
-        if (totalBobot != 100) {
-            System.out.println("Total bobot harus 100");
-            return null;
-        }
-
-        return bobotFinal;
-    }
-
-    /**
-     * Membaca dan menjumlahkan bobot serta perolehan nilai dari tiap subkomponen.
-     */
-    private static void prosesSubkomponen(Scanner in, int[] totalBobotKomponen, int[] totalPerolehan) {
+        // 2. Membaca Baris Input KomponenNilai sampai '---'
         while (in.hasNextLine()) {
             String baris = in.nextLine().trim();
             if (baris.equals("---")) break;
@@ -67,7 +40,13 @@ public class App {
             }
 
             String simbol = potongan[0].trim();
-            int idx = cariIndeksSimbol(simbol);
+            int idx = -1;
+            for (int i = 0; i < 6; i++) {
+                if (kode[i].equals(simbol)) {
+                    idx = i;
+                    break;
+                }
+            }
 
             if (idx == -1) {
                 System.out.println("Simbol tidak dikenal");
@@ -78,31 +57,18 @@ public class App {
                 int b = Integer.parseInt(potongan[1].trim());
                 int p = Integer.parseInt(potongan[2].trim());
 
-                // Clamping dihapus sesuai spesifikasi agar tidak mengubah hasil perolehan nilai
+                // Clamping perolehan nilai agar tidak melebihi bobot komponen atau < 0
+                if (p > b) p = b;
+                if (p < 0) p = 0;
+
                 totalBobotKomponen[idx] += b;
                 totalPerolehan[idx] += p;
             } catch (NumberFormatException e) {
                 System.out.println("Data tidak valid. Silahkan menggunakan format: Simbol|Bobot|Perolehan-Nilai");
             }
         }
-    }
 
-    /**
-     * Mencari indeks simbol komponen pada array referensi.
-     */
-    private static int cariIndeksSimbol(String simbol) {
-        for (int i = 0; i < KODE.length; i++) {
-            if (KODE[i].equals(simbol)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Menghitung persentase, kontribusi nilai, total nilai akhir, dan mencetak hasilnya.
-     */
-    private static void hitungDanCetakOutput(int[] bobotFinal, int[] totalBobotKomponen, int[] totalPerolehan) {
+        // 3. Perhitungan dan Cetak Output
         double nilaiAkhir = 0.0;
         System.out.println("Perolehan Nilai:");
 
@@ -111,7 +77,7 @@ public class App {
             double kontribusi = Math.round((persen / 100.0) * bobotFinal[i] * 100) / 100.0;
             nilaiAkhir += kontribusi;
 
-            System.out.printf(">> %s: %d/100 (%.2f/%d)%n", NAMA[i], persen, kontribusi, bobotFinal[i]);
+            System.out.printf(">> %s: %d/100 (%.2f/%d)%n", nama[i], persen, kontribusi, bobotFinal[i]);
         }
 
         nilaiAkhir = Math.round(nilaiAkhir * 100) / 100.0;
@@ -119,11 +85,10 @@ public class App {
         System.out.println();
         System.out.printf(">> Nilai Akhir: %.2f%n", nilaiAkhir);
         System.out.println(">> Grade: " + tentukanGrade(nilaiAkhir));
+
+        in.close();
     }
 
-    /**
-     * Menentukan grade berdasarkan standar acuan batas nilai.
-     */
     static String tentukanGrade(double n) {
         if (n >= 79.5) return "A";
         if (n >= 72.0) return "AB";
