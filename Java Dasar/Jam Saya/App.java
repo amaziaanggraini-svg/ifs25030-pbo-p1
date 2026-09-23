@@ -1,6 +1,9 @@
 import java.util.Scanner;
 
 public class App {
+
+    private static final int MINUTES_IN_DAY = 1440;
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -11,40 +14,54 @@ public class App {
         }
 
         String line1 = sc.nextLine().trim();
+        int currentMinutes = parseJamAwal(line1);
 
-        int colonIndex = line1.indexOf(':');
-        if (colonIndex == -1 || colonIndex != line1.lastIndexOf(':')) {
+        if (currentMinutes == -1) {
             System.out.println("Jam tidak valid");
             sc.close();
             return;
         }
 
-        String[] timeParts = line1.split(":");
+        String jamAwal = String.format("%02d:%02d", currentMinutes / 60, currentMinutes % 60);
+        
+        prosesPergeseran(sc, currentMinutes, jamAwal);
+
+        sc.close();
+    }
+
+    /**
+     * Memvalidasi dan mengubah format HH:mm menjadi total menit sejak 00:00.
+     * Mengembalikan -1 jika format tidak valid.
+     */
+    private static int parseJamAwal(String line) {
+        int colonIndex = line.indexOf(':');
+        if (colonIndex == -1 || colonIndex != line.lastIndexOf(':')) {
+            return -1;
+        }
+
+        String[] timeParts = line.split(":");
         if (timeParts.length != 2) {
-            System.out.println("Jam tidak valid");
-            sc.close();
-            return;
+            return -1;
         }
 
-        int startH, startM;
         try {
-            startH = Integer.parseInt(timeParts[0].trim());
-            startM = Integer.parseInt(timeParts[1].trim());
+            int startH = Integer.parseInt(timeParts[0].trim());
+            int startM = Integer.parseInt(timeParts[1].trim());
+
+            if (startH < 0 || startH > 23 || startM < 0 || startM > 59) {
+                return -1;
+            }
+
+            return startH * 60 + startM;
         } catch (NumberFormatException e) {
-            System.out.println("Jam tidak valid");
-            sc.close();
-            return;
+            return -1;
         }
+    }
 
-        if (startH < 0 || startH > 23 || startM < 0 || startM > 59) {
-            System.out.println("Jam tidak valid");
-            sc.close();
-            return;
-        }
-
-        String jamAwal = String.format("%02d:%02d", startH, startM);
-
-        int currentMinutes = startH * 60 + startM;
+    /**
+     * Memproses perintah pergeseran menit menggunakan aritmetika modulo tanpa looping per menit.
+     */
+    private static void prosesPergeseran(Scanner sc, int currentMinutes, String jamAwal) {
         int totalGeser = 0;
         int pergantianHari = 0;
 
@@ -67,43 +84,42 @@ public class App {
             int n = Integer.parseInt(command);
             totalGeser += n;
 
-            // Simulasi per 1 menit atau kalkulasi langsung
+            // Perhitungan efisien tanpa looping 1-per-1
             if (n > 0) {
-                for (int i = 0; i < n; i++) {
-                    currentMinutes++;
-                    if (currentMinutes == 1440) {
-                        pergantianHari++;
-                        currentMinutes = 0;
-                    }
-                }
+                int totalTarget = currentMinutes + n;
+                pergantianHari += totalTarget / MINUTES_IN_DAY;
+                currentMinutes = totalTarget % MINUTES_IN_DAY;
             } else if (n < 0) {
-                for (int i = 0; i < -n; i++) {
-                    if (currentMinutes == 0) {
-                        pergantianHari++;
-                        currentMinutes = 1440;
-                    }
-                    currentMinutes--;
+                int geser = -n;
+                if (geser < currentMinutes) {
+                    currentMinutes -= geser;
+                } else if (geser == currentMinutes) {
+                    currentMinutes = 0;
+                } else {
+                    int sisa = geser - currentMinutes;
+                    int countHari = 1 + (sisa - 1) / MINUTES_IN_DAY;
+                    pergantianHari += countHari;
+                    currentMinutes = (MINUTES_IN_DAY - (sisa % MINUTES_IN_DAY)) % MINUTES_IN_DAY;
                 }
             }
         }
 
-        int finalH = currentMinutes / 60;
-        if (finalH == 24) finalH = 0;
-        int finalM = currentMinutes % 60;
+        cetakHasil(jamAwal, currentMinutes, totalGeser, pergantianHari);
+    }
+
+    /**
+     * Mencetak output statistik jam awal, jam akhir, total menit, dan pergantian hari.
+     */
+    private static void cetakHasil(String jamAwal, int finalMinutes, int totalGeser, int pergantianHari) {
+        int finalH = finalMinutes / 60;
+        int finalM = finalMinutes % 60;
         String jamAkhir = String.format("%02d:%02d", finalH, finalM);
 
-        String strTotalMenit;
-        if (totalGeser > 0) {
-            strTotalMenit = "+" + totalGeser;
-        } else {
-            strTotalMenit = String.valueOf(totalGeser);
-        }
+        String strTotalMenit = (totalGeser > 0) ? "+" + totalGeser : String.valueOf(totalGeser);
 
         System.out.println("Jam Awal: " + jamAwal);
         System.out.println("Jam Akhir: " + jamAkhir);
         System.out.println("Total Menit: " + strTotalMenit);
         System.out.println("Pergantian Hari: " + pergantianHari);
-
-        sc.close();
     }
 }
