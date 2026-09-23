@@ -31,7 +31,7 @@ public class App {
 
     /**
      * Memvalidasi dan mengubah format HH:mm menjadi total menit sejak 00:00.
-     * Mengembalikan -1 jika format tidak valid.
+     * Mengembalikan -1 jika format jam tidak valid.
      */
     private static int parseJamAwal(String line) {
         int colonIndex = line.indexOf(':');
@@ -59,7 +59,7 @@ public class App {
     }
 
     /**
-     * Memproses perintah pergeseran menit menggunakan aritmetika modulo tanpa looping per menit.
+     * Memproses perintah pergeseran (+ / -) dan menghitung pergantian hari dengan aritmetika modulo.
      */
     private static void prosesPergeseran(Scanner sc, int currentMinutes, String jamAwal) {
         int totalGeser = 0;
@@ -84,7 +84,6 @@ public class App {
             int n = Integer.parseInt(command);
             totalGeser += n;
 
-            // Perhitungan efisien tanpa looping 1-per-1
             if (n > 0) {
                 int totalTarget = currentMinutes + n;
                 pergantianHari += totalTarget / MINUTES_IN_DAY;
@@ -98,7 +97,10 @@ public class App {
                 } else {
                     int sisa = geser - currentMinutes;
                     int countHari = 1 + (sisa - 1) / MINUTES_IN_DAY;
+                    
+                    // Pergantian hari bertambah (frekuensi melewati batas hari/00:00)
                     pergantianHari += countHari;
+
                     currentMinutes = (MINUTES_IN_DAY - (sisa % MINUTES_IN_DAY)) % MINUTES_IN_DAY;
                 }
             }
@@ -108,7 +110,7 @@ public class App {
     }
 
     /**
-     * Mencetak output statistik jam awal, jam akhir, total menit, dan pergantian hari.
+     * Mencetak output statistik sesuai dengan spesifikasi format.
      */
     private static void cetakHasil(String jamAwal, int finalMinutes, int totalGeser, int pergantianHari) {
         int finalH = finalMinutes / 60;

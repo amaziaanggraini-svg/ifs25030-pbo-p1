@@ -1,77 +1,71 @@
 import java.util.Scanner;
 
 public class App {
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        if (!sc.hasNextInt()) {
+
+        int n = parseInput(sc);
+
+        // Validasi n tidak boleh negatif atau nol
+        if (n <= 0) {
             sc.close();
             return;
         }
 
-        int n = sc.nextInt();
-        long[][] matrix = new long[n][n];
+        System.out.println("Pola L:");
+        cetakPolaL(n);
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                matrix[i][j] = sc.nextLong();
-            }
-        }
+        System.out.println();
 
-        if (n < 3) {
-            long totalSum = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    totalSum += matrix[i][j];
-                }
-            }
-            System.out.println("Nilai L: Tidak Ada");
-            System.out.println("Nilai Kebalikan L: Tidak Ada");
-            System.out.println("Nilai Tengah: " + totalSum);
-            System.out.println("Perbedaan: Tidak Ada");
-            System.out.println("Dominan: " + totalSum);
-        } else {
-            long sumL = 0;
-            long sumRevL = 0;
-            long sumCenter = 0;
-
-            for (int i = 0; i < n; i++) {
-                sumL += matrix[i][0];
-            }
-            for (int j = 1; j < n - 1; j++) {
-                sumL += matrix[n - 1][j];
-            }
-
-            for (int j = 1; j < n; j++) {
-                sumRevL += matrix[0][j];
-            }
-            for (int i = 1; i < n; i++) {
-                sumRevL += matrix[i][n - 1];
-            }
-
-            if (n % 2 != 0) {
-                sumCenter = matrix[n / 2][n / 2];
-            } else {
-                int mid = n / 2;
-                sumCenter = matrix[mid - 1][mid - 1] + matrix[mid - 1][mid]
-                          + matrix[mid][mid - 1]     + matrix[mid][mid];
-            }
-
-            long diff = Math.abs(sumL - sumRevL);
-
-            long maxVal;
-            if (sumL == sumRevL) {
-                maxVal = sumCenter; 
-            } else {
-                maxVal = Math.max(sumL, Math.max(sumRevL, sumCenter));
-            }
-
-            System.out.println("Nilai L: " + sumL);
-            System.out.println("Nilai Kebalikan L: " + sumRevL);
-            System.out.println("Nilai Tengah: " + sumCenter);
-            System.out.println("Perbedaan: " + diff);
-            System.out.println("Dominan: " + maxVal);
-        }
+        System.out.println("Pola L Kebalikan:");
+        cetakPolaLKebalikan(n);
 
         sc.close();
+    }
+
+    /**
+     * Membaca dan memvalidasi input integer dari Scanner.
+     * Mengembalikan -1 jika input tidak ada atau bukan integer.
+     */
+    private static int parseInput(Scanner sc) {
+        if (!sc.hasNextInt()) {
+            return -1;
+        }
+        return sc.nextInt();
+    }
+
+    /**
+     * Mencetak pola L standar berukuran n.
+     */
+    private static void cetakPolaL(int n) {
+        // Batang vertikal
+        for (int i = 0; i < n - 1; i++) {
+            System.out.println("*");
+        }
+        // Garis horizontal bawah
+        for (int i = 0; i < n; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+    }
+
+    /**
+     * Mencetak pola L kebalikan (terbalik) berukuran n.
+     */
+    private static void cetakPolaLKebalikan(int n) {
+        // Garis horizontal atas
+        for (int i = 0; i < n; i++) {
+            System.out.print("*");
+        }
+        System.out.println();
+
+        // Batang vertikal di sisi kanan
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - 1; j++) {
+                System.out.print(" ");
+            }
+            System.out.println("*");
+        }
     }
 }
